@@ -54,6 +54,11 @@ import javax.swing.table.TableModel;
 import javax.swing.text.Document;
 import org.json.JSONArray;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class MoveListFrame extends JFrame {
   public final DecimalFormat FORMAT_PERCENT = new DecimalFormat("#0.00");
   public final DecimalFormat FORMAT_INT = new DecimalFormat("#0");
@@ -240,6 +245,9 @@ public class MoveListFrame extends JFrame {
   private int parse3WhiteScoreMiss2 = 0;
   private int parse3WhiteScoreMiss3 = 0;
   private BoardHistoryNode curMouseOverNode;
+  
+  private boolean written = false;
+  private boolean written_title = false;
 
   private List<bigMistakeInfo> BigMistakeList = new ArrayList<bigMistakeInfo>();
   private int mouseOverBigMistakeIndex = -1; // 0-9
@@ -2224,7 +2232,7 @@ public class MoveListFrame extends JFrame {
       parse3WhiteScoreMiss2 = 0;
       parse3WhiteScoreMiss3 = 0;
     }
-
+    
     BoardHistoryNode node = Lizzie.board.getHistory().getCurrentHistoryNode();
     if (showBranch.getSelectedIndex() == 0 && !node.isMainTrunk()) {
       node = Lizzie.board.getHistory().getMainEnd();
@@ -5144,6 +5152,11 @@ public class MoveListFrame extends JFrame {
           newBigMistakeInfo.isBlack = nodeInfo.isBlack;
           newBigMistakeInfo.diffWinrate = nodeInfo.getWinrateDiff();
           newBigMistakeInfo.coords = nodeInfo.coords;
+          newBigMistakeInfo.currentDiff = nodeInfo.scoreLead;
+          String bestMove = node.getData().bestMoves.get(0).coordinate;
+          newBigMistakeInfo.bestx = bestMove.charAt(0) - 'A' + 1;
+          
+          newBigMistakeInfo.besty = Integer.parseInt(bestMove.substring(1));
           if (nodeInfo.isBlack) {
             blackBigMistakeList.add(newBigMistakeInfo);
           } else {
@@ -5170,8 +5183,8 @@ public class MoveListFrame extends JFrame {
               else return -1;
             }
           });
-      if (blackBigMistakeList.size() > 5) blackBigMistakeList = blackBigMistakeList.subList(0, 5);
-      if (whiteBigMistakeList.size() > 5) whiteBigMistakeList = whiteBigMistakeList.subList(0, 5);
+      if (blackBigMistakeList.size() > 15) blackBigMistakeList = blackBigMistakeList.subList(0, 15);
+      if (whiteBigMistakeList.size() > 15) whiteBigMistakeList = whiteBigMistakeList.subList(0, 15);
       AllBigMistakeList.addAll(blackBigMistakeList);
       AllBigMistakeList.addAll(whiteBigMistakeList);
       Collections.sort(
@@ -5184,6 +5197,7 @@ public class MoveListFrame extends JFrame {
             }
           });
       BigMistakeList = AllBigMistakeList;
+      //System.out.println(BigMistakeList.size());
 
       FontMetrics fm =
           g.getFontMetrics(
@@ -5212,6 +5226,11 @@ public class MoveListFrame extends JFrame {
           newBigMistakeInfo.isBlack = nodeInfo.isBlack;
           newBigMistakeInfo.diffWinrate = nodeInfo.getScoreMeanDiff();
           newBigMistakeInfo.coords = nodeInfo.coords;
+          newBigMistakeInfo.currentDiff = nodeInfo.scoreLead;
+          String bestMove = node.getData().bestMoves.get(0).coordinate;
+          newBigMistakeInfo.bestx = bestMove.charAt(0) - 'A' + 1;
+          
+          newBigMistakeInfo.besty = Integer.parseInt(bestMove.substring(1));
           if (nodeInfo.isBlack) {
             blackBigMistakeList.add(newBigMistakeInfo);
           } else {
@@ -5238,8 +5257,8 @@ public class MoveListFrame extends JFrame {
               else return -1;
             }
           });
-      if (blackBigMistakeList.size() > 5) blackBigMistakeList = blackBigMistakeList.subList(0, 5);
-      if (whiteBigMistakeList.size() > 5) whiteBigMistakeList = whiteBigMistakeList.subList(0, 5);
+      if (blackBigMistakeList.size() > 15) blackBigMistakeList = blackBigMistakeList.subList(0, 15);
+      if (whiteBigMistakeList.size() > 15) whiteBigMistakeList = whiteBigMistakeList.subList(0, 15);
       AllBigMistakeList.addAll(blackBigMistakeList);
       AllBigMistakeList.addAll(whiteBigMistakeList);
       Collections.sort(
@@ -5260,8 +5279,114 @@ public class MoveListFrame extends JFrame {
       int heightFont = fm.getAscent() - fm.getDescent();
       g.setStroke(new BasicStroke(1));
       g.drawLine(0, height - heightFont - 10, width, height - heightFont - 10);
-      for (int i = 0; i < BigMistakeList.size(); i++)
-        drawOneBigMistakePoint(g, width, height, BigMistakeList.get(i), i, true);
+      String filePath = "/C://analyze/filename4.txt";  // 指定文件路径
+      if (!written_title) {
+    	  
+    	   // 创建一个FileWriter对象，将文件追加写入模式设置为true
+    	      FileWriter fileWriter1;
+    			try {
+    				fileWriter1 = new FileWriter(filePath, true);
+    				BufferedWriter bufferedWriter1 = new BufferedWriter(fileWriter1);
+    				bufferedWriter1.newLine();
+    				bufferedWriter1.newLine();
+    				String title = Lizzie.board.filename;
+    				int index = 0;
+    				for (int i = 0; i < title.length(); i++) {
+    					char c = title.charAt(i);
+    					if (Character.isDigit(c)) {
+    						index = i;
+    						break;
+    					}
+    				}
+    				bufferedWriter1.write(title.substring(index));
+    				bufferedWriter1.newLine();
+    				bufferedWriter1.newLine();
+    				bufferedWriter1.close();
+    			} catch (IOException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+    			written_title = true;
+
+    	      // 使用BufferedWriter来包装FileWriter，提高写入性能
+      }
+      
+      for (int i = 0; i < BigMistakeList.size(); i++) {
+    	  drawOneBigMistakePoint(g, width, height, BigMistakeList.get(i), i, true);
+    	  if (!written) {
+    		  String title = Lizzie.board.filename;
+    		  String curr_color = title.substring((title.indexOf("执") + 1), (title.indexOf("执") + 2));
+    		  //System.out.println("curr_color " + curr_color);
+    		  
+	          bigMistakeInfo bigMistakeInfo = BigMistakeList.get(i);
+	          String color = "";
+	          if (bigMistakeInfo.moveNumber % 2 == 0) {
+	        	  color = " 白 ";
+	          } else {
+	        	  color = " 黑 ";
+	          }
+        	  try {
+	        	  File file = new File("/C://analyze/filename.txt");
+	        	  
+	        	      	   // if file doesnt exists, then create it
+		      	  if (!file.exists()) {
+		      	    file.createNewFile();
+		      	  }
+	              // 创建一个FileWriter对象，将文件追加写入模式设置为true
+	              FileWriter fileWriter = new FileWriter(filePath, true);
+	
+	              // 使用BufferedWriter来包装FileWriter，提高写入性能
+	              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+	              
+	              //String bestMove = bigMistakeInfo.getData().bestMoves.get(0).coordinate;
+	              //System.out.println(bestMove);
+	              int bx = bigMistakeInfo.bestx, by = bigMistakeInfo.besty;
+	              int x = bigMistakeInfo.coords[0] + 1;
+	              int y = bigMistakeInfo.coords[1] + 1;
+	              String problem = "";
+	              String name = "";
+	              if (color.trim().equals(curr_color)) {
+	            	  //System.out.print("yes");
+	            	  name = " hp ";
+	            	  //System.out.print("bx " + bx + " by " + by + " x " + x + " y " + y);
+//	            	  if (Math.abs(bx - x) + Math.abs(by - y) >= 100) {
+//		            	  problem = "脱先";
+//		              } else 
+	            	  if (bigMistakeInfo.diffWinrate > 6) {
+		            	  problem = "大勺";
+		              } else if (bigMistakeInfo.diffWinrate > 3) {
+		            	  problem = "计算";
+		              }
+	              }
+	              
+	              // 要写入的内容
+//	              System.out.println(Math.abs(bigMistakeInfo.diffWinrate));
+	              if (Math.abs(bigMistakeInfo.diffWinrate) > 1.5) {
+		              String content = name + color + " 手数 " + bigMistakeInfo.moveNumber + " 亏目 " + String.format("%.2f", bigMistakeInfo.diffWinrate)
+		            		  + " 胜率 " + String.format("%.2f", bigMistakeInfo.currentMoveWinRate) 
+		            		  + " 目差 " + String.format("%.2f", bigMistakeInfo.currentDiff)
+		            		  + " 坐标 " + x 
+		            				  + " " + y + " " + problem;
+		              bufferedWriter.write(content);
+		              bufferedWriter.newLine();  // 写入换行符
+	              }
+	
+	              // 写入内容
+	
+	              // 关闭BufferedWriter
+	              bufferedWriter.close();
+	
+	              System.out.println("Content written to the file.");
+	              //System.out.println("getdata " + Lizzie.board.getData().toString());
+	          } catch (IOException e) {
+	              e.printStackTrace();
+	          }
+	          
+	          
+    	  }
+      }
+      written = true;
+        
     } else {
       //   boolean lastMatch = false;
       //     boolean lastMatchBlack = false;
@@ -5984,9 +6109,33 @@ public class MoveListFrame extends JFrame {
     //
     g.setFont(new Font(Config.sysDefaultFontName, Font.PLAIN, Config.frameFontSize));
     g.drawString(
-        String.format(Locale.ENGLISH, "%.1f", bigMistakeInfo.diffWinrate) + (isScore ? "" : "%"),
+        String.format(Locale.ENGLISH, "%.1f", bigMistakeInfo.diffWinrate) + (isScore ? "" : "%") + "测试理论与",
         width / 20 + index * width / 10 + height / 13,
-        (int) (height * 0.15 + height * 0.7 * (100 - bigMistakeInfo.currentMoveWinRate) / 100.0));
+        (int) (height * 0.15 + height * 0.7 * (100 - bigMistakeInfo.currentMoveWinRate) / 100.0) );
+    //bigMistakeInfo.
+    
+//    try {
+//
+//    	   String content = "降点 " + bigMistakeInfo.moveNumber + " " + bigMistakeInfo.diffWinrate;
+//
+//    	   File file = new File("/C://analyze/filename.txt");
+//
+//    	   // if file doesnt exists, then create it
+//    	   if (!file.exists()) {
+//    	    file.createNewFile();
+//    	   }
+//
+//    	   FileWriter fw = new FileWriter(file.getAbsoluteFile());
+//    	   BufferedWriter bw = new BufferedWriter(fw);
+//    	   bw.write(content);
+//    	   bw.newLine();
+//    	   bw.close();
+//
+//    	   //System.out.println("Done");
+//
+//    	  } catch (IOException e) {
+//    	   e.printStackTrace();
+//    	  }
   }
 
   public void drawLossPanel(Graphics2D g, int width, int height, boolean isWinrate) {
@@ -8276,6 +8425,9 @@ class bigMistakeInfo {
   int moveNumber;
   Double diffWinrate;
   Double currentMoveWinRate;
+  Double currentDiff;
+  int bestx;
+  int besty;
 }
 //  public  JFrame createBadmovesDialog() {
 //    // Create and set up the window.

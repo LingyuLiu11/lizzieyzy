@@ -73,6 +73,7 @@ public class Board {
   public BoardHistoryNode mouseOnNode;
   private long reviewStartTime = -1;
   public int[] mouseOnStoneCoords = LizzieFrame.outOfBoundCoordinate;
+  public String filename;
 
   public Board() {
     initialize(false);

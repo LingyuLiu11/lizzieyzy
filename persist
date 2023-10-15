@@ -2,21 +2,48 @@
   "autosave": "",
   "checked-empty-blunder-thresholds": true,
   "ui-persist": {
-    "fast-commands-height": 500,
-    "fast-commands-width": 500,
     "gtp-console-position": [
-      2067,
-      509,
+      2049,
+      360,
       400,
       650
     ],
+    "main-window-blunder": [
+      15,
+      15,
+      15
+    ],
+    "winrate-graph": [0],
+    "suggestions-list-position-9": [
+      -9,
+      550,
+      650,
+      320,
+      62,
+      47,
+      67,
+      97,
+      62,
+      77,
+      62,
+      96,
+      62
+    ],
+    "main-window-position": [
+      603,
+      62,
+      1760,
+      1416
+    ],
+    "fast-commands-height": 500,
+    "fast-commands-width": 500,
     "gtp-console-opened": true,
     "board-postion-propotion": 4,
     "toolbar-parameter": [
       1,
       -1,
       1,
-      2,
+      1,
       1,
       -1,
       -1,
@@ -65,12 +92,25 @@
       false,
       false
     ],
-    "main-window-blunder": [
-      15,
-      15,
-      15
+    "badmoves-list-position": [
+      2,
+      -1,
+      9,
+      2568,
+      1411,
+      243,
+      241,
+      244,
+      267,
+      261,
+      267,
+      261,
+      267,
+      252,
+      75,
+      75,
+      75
     ],
-    "winrate-graph": [0],
     "main-window-other": [
       26,
       -5,
@@ -80,18 +120,12 @@
     ],
     "window-maximized": true,
     "main-window-list": [
-      103,
       118,
       118,
-      132,
+      117,
+      118,
       118
-    ],
-    "main-window-position": [
-      203,
-      274,
-      1065,
-      700
     ]
   },
-  "filesystem": {"last-folder": ""}
+  "filesystem": {"last-folder": "C:\\google download"}
 }

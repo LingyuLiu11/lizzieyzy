@@ -55,7 +55,8 @@ public class SGFParser {
     if (!file.exists() || !file.canRead()) {
       return false;
     }
-
+    Lizzie.board.filename = filename;
+    System.out.println(Lizzie.board.filename);
     String encoding = EncodingDetector.detect(filename);
     FileInputStream fp = new FileInputStream(file);
     if (encoding == "WINDOWS-1252") encoding = "GB18030";
